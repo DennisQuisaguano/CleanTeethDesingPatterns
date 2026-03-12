@@ -1,12 +1,17 @@
 ﻿
 using CleanTeeth.Domain.Exceptions;
-using System.Xml.Linq;
+using System.Text.RegularExpressions;
 
 namespace CleanTeeth.Domain.ValueObjects;
 
 public class Email
 {
-    public string Value { get;} = null!;
+    private static readonly Regex EmailRegex = new(
+        @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase
+    );
+
+    public string Value { get; } = null!;
 
     public Email(string email)
     {
@@ -15,14 +20,11 @@ public class Email
             throw new BusinessRuleException($"El {nameof(email)} es obligatorio");
         }
 
-        //validar por completo el email -- expresiones regulares
-
-        if (!email.Contains("@"))
+        if (!EmailRegex.IsMatch(email))
         {
             throw new BusinessRuleException($"El {nameof(email)} no es valido");
         }
 
         Value = email;
-
     }
 }
